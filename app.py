@@ -1,85 +1,131 @@
+# Импортируем сам Flask и необходимые вспомогательные инструменты из библиотеки
 from flask import Flask, request, url_for, redirect, abort
 
+# Создаём главный экземпляр веб-приложения Flask
 app = Flask(__name__)
 
 # --- Zadanie 1: Powitanie ---
+# Объявляем маршрут с динамическим текстовым параметром 'imie' в URL
 @app.route("/czesc/<imie>")
-def czesc(imie):
-    return f"Cześć, {imie}!"
+def czesc(imie): # Функция принимает имя, автоматически вытащенное из URL
+    return f"Cześć, {imie}!" # Возвращаем приветственную строку с подставленным именем
 
+
+# Маршрут с двумя параметрами: имя (текст) и возраст (только целое число)
 @app.route("/czesc/<imie>/<int:wiek>")
-def czesc_wiek(imie, wiek):
+def czesc_wiek(imie, wiek): # Функция принимает параметры 'imie' и 'wiek'
+    # Возвращаем приветствие с именем и возрастом
     return f"Cześć, {imie}, masz {wiek} lat."
 
+
 # --- Zadanie 2: Kalkulator ---
+# Маршрут для сложения двух целых чисел 'a' и 'b'
 @app.route("/dodaj/<int:a>/<int:b>")
-def dodaj(a, b):
-    return f"{a} + {b} = {a + b}"
+def dodaj(a, b): # Функция принимает слагаемые a и b
+    return f"{a} + {b} = {a + b}" # Вычисляем сумму и возвращаем результат в виде строки
 
+
+# Маршрут для вычитания двух целых чисел 'a' и 'b'
 @app.route("/odejmij/<int:a>/<int:b>")
-def odejmij(a, b):
-    return f"{a} - {b} = {a - b}"
+def odejmij(a, b): # Функция принимает уменьшаемое a и вычитаемое b
+    return f"{a} - {b} = {a - b}" # Возвращаем результат вычитания
 
+
+# Маршрут для умножения двух целых чисел 'a' и 'b'
 @app.route("/pomnoz/<int:a>/<int:b>")
-def pomnoz(a, b):
-    return f"{a} * {b} = {a * b}"
+def pomnoz(a, b): # Функция принимает множители a и b
+    return f"{a} * {b} = {a * b}" # Возвращаем результат умножения
 
+
+# Маршрут для деления двух целых чисел 'a' и 'b'
 @app.route("/podziel/<int:a>/<int:b>")
-def podziel(a, b):
-    if b == 0:
+def podziel(a, b): # Функция принимает делимое a и делитель b
+    if b == 0: # Проверяем, не равен ли делитель нулю
+        # Если ноль, возвращаем текст ошибки и HTTP-статус 400 Bad Request
         return "Nie dzielimy przez zero", 400
-    return f"{a} / {b} = {a / b}"
+    return f"{a} / {b} = {a / b}" # Если не ноль, выполняем деление и возвращаем ответ
 
+
+# Маршрут для возведения числа 'a' в степень 'b'
 @app.route("/potega/<int:a>/<int:b>")
-def potega(a, b):
-    return f"{a} ^ {b} = {a ** b}"
+def potega(a, b): # Функция принимает основание 'a' и показатель 'b'
+    return f"{a} ^ {b} = {a ** b}" # Возводим в степень оператором '**' и возвращаем результат
+
 
 # --- Zadanie 3: Tabliczka mnożenia ---
+# Маршрут для таблицы умножения числа 'n'
 @app.route("/tabliczka/<int:n>")
-def tabliczka(n):
-    if n < 1 or n > 20:
+def tabliczka(n): # Функция принимает число n
+    if n < 1 or n > 20: # Проверяем валидацию: число должно быть в отрезке 1–20
+        # Возвращаем сообщение об ошибке и HTTP-статус 400
         return "Liczba n musi być w przedziale 1-20", 400
-    
-    wynik = []
-    for i in range(1, 11):
+
+    wynik = [] # Создаём пустой список для строк таблицы умножения
+    for i in range(1, 11): # Запускаем цикл от 1 до 10 включительно
+        # Добавляем в список сформированный пример (например, "5 x 1 = 5")
         wynik.append(f"{n} x {i} = {n * i}")
+
+    # Склеиваем элементы списка в один текст, разделяя их HTML-тегом <br> (перенос строки)
     return "<br>".join(wynik)
 
+
 # --- Zadanie 4: Query string ---
-@app.route("/produkty")
-def produkty():
+@app.route("/produkty") # Маршрут без внутренних параметров в пути URL
+def produkty(): # Функция обработчика
+    # Извлекаем параметр 'kat' из URL (?kat=...); если его нет, ставим "wszystkie"
     kat = request.args.get("kat", "wszystkie")
+    # Извлекаем параметр 'sort' из URL (?sort=...); если его нет, ставим "domyślne"
     sort = request.args.get("sort", "domyślne")
+    # Возвращаем строку с полученными значениями параметров
     return f"Kategoria: {kat}, sortowanie: {sort}"
 
+
 # --- Zadanie 5: Mini-baza w słowniku (Korty tenisowe / Rezerwacje) ---
-KORTY = {
+KORTY = { # Создаём словарь, выполняющий роль временной базы данных
     1: "Kort Centralny (Nawierzchnia ceglana)",
     2: "Kort 2 (Trawa)",
     3: "Kort 3 (Hard court)",
     4: "Kort Kryty A (Hala)",
-    5: "Kort Kryty B (Hala)"
+    5: "Kort Kryty B (Hala)",
 }
 
-@app.route("/element/<int:id>")
-def element(id):
-    if id not in KORTY:
-        abort(404)
-    return f"Kort: {KORTY[id]}"
 
-@app.route("/elementy")
-def elementy():
-    lista = [f"{k:id}: {nazwa}" for id, nazwa in KORTY.items()]
+# Маршрут для поиска одного элемента по его числовому ID
+@app.route("/element/<int:id>")
+def element(id): # Функция принимает ID из адреса
+    if id not in KORTY: # Проверяем, есть ли такой ключ (id) в словаре KORTY
+        abort(404) # Если ключа нет, вызываем ошибку 404 Not Found
+    return f"Kort: {KORTY[id]}" # Если есть, возвращаем название элемента по ID
+
+
+@app.route("/elementy") # Маршрут для получения всех элементов базы
+def elementy(): # Функция без параметров
+    # Генератором списка форматируем все пары (id, название) из словаря в текстовые строки
+    lista = [f"{id}: {nazwa}" for id, nazwa in KORTY.items()]
+    # Соединяем все получившиеся строки тегом <br> для вывода списком в браузере
     return "<br>".join(lista)
 
-# --- Zadanie 6: Przekierowanie ---
-@app.route("/")
-def index():
-    return "Strona główna serwisu"
 
-@app.route("/start")
-def start():
+# --- Zadanie 6: Przekierowanie ---
+@app.route("/") # Маршрут для главной страницы приложения
+def index(): # Функция главной страницы
+    return "Strona główna serwisu" # Возвращаем простой текст главной страницы
+
+
+@app.route("/start") # Маршрут для перенаправления
+def start(): # Функция, вызываемая по адресу /start
+    # Генерируем URL для функции index() и перенаправляем пользователя (HTTP 302)
     return redirect(url_for("index"))
 
+
+# Проверяем, запущен ли данный файл напрямую
 if __name__ == "__main__":
+    # Запускаем локальный веб-сервер с включённым режимом отладки (debug mode)
     app.run(debug=True)
+
+
+# ==============================================================================
+# КРАТКОЕ ОБЪЯСНЕНИЕ КЛЮЧЕВЫХ КОНЦЕПЦИЙ В КОДЕ:
+# ==============================================================================
+# 1. f-строки (f"...") — позволяют вставлять переменные и выражения прямо в текст
+# через фигурные скобки {переменная}. Это чище и удобнее склейки через "+".
