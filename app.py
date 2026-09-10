@@ -101,7 +101,10 @@ def element(id): # Функция принимает ID из адреса
 @app.route("/elementy") # Маршрут для получения всех элементов базы
 def elementy(): # Функция без параметров
     # Генератором списка форматируем все пары (id, название) из словаря в текстовые строки
-    lista = [f"{id}: {nazwa}" for id, nazwa in KORTY.items()]
+   lista = []
+for id, nazwa in KORTY.items():
+    lista.append(f"{id}: {nazwa}")
+
     # Соединяем все получившиеся строки тегом <br> для вывода списком в браузере
     return "<br>".join(lista)
 
