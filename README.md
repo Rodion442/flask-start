@@ -4,8 +4,8 @@ Projekt aplikacji webowej Flask — dynamiczne ścieżki.
 
 ## Lista tras
 
-- `/czesc/<imie>` — Powitanie (np. `/czesc/Jan`)
-- `/czesc/<imie>/<int:wiek>` — Powitanie z wiekiem (np. `/czesc/Jan/20`)
+- `/czesc/<imie>` — Powitanie (np. `/czesc/Rodion`)
+- `/czesc/<imie>/<int:wiek>` — Powitanie z wiekiem (np. `/czesc/Rodion/20`)
 - `/dodaj/<int:a>/<int:b>` — Dodawanie (np. `/dodaj/5/3`)
 - `/odejmij/<int:a>/<int:b>` — Odejmowanie (np. `/odejmij/10/4`)
 - `/pomnoz/<int:a>/<int:b>` — Mnożenie (np. `/pomnoz/4/5`)
@@ -18,4 +18,4 @@ Projekt aplikacji webowej Flask — dynamiczne ścieżki.
 - `/start` — Przekierowanie 302 na `/`
 
 ## Odpowiedź na pytanie z Zadania 1
-Gdy w wieku podamy tekst (np. `/czesc/Jan/abc`), Flask zwróci błąd **404 Not Found**, ponieważ konwerter `<int:wiek>` oczekuje wyłącznie liczby całkowitej.
+Gdy w wieku podamy tekst (np. `/czesc/Rodion/abc`), Flask zwróci błąd **404 Not Found**, ponieważ konwerter `<int:wiek>` oczekuje wyłącznie liczby całkowitej.
