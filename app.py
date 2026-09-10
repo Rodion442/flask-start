@@ -1,48 +1,85 @@
-from flask import Flask
+from flask import Flask, request, url_for, redirect, abort
 
-# Inicjalizacja aplikacji Flask
 app = Flask(__name__)
 
+# --- Zadanie 1: Powitanie ---
+@app.route("/czesc/<imie>")
+def czesc(imie):
+    return f"Cześć, {imie}!"
 
-# Zadanie 2 & 3: Strona główna
+@app.route("/czesc/<imie>/<int:wiek>")
+def czesc_wiek(imie, wiek):
+    return f"Cześć, {imie}, masz {wiek} lat."
+
+# --- Zadanie 2: Kalkulator ---
+@app.route("/dodaj/<int:a>/<int:b>")
+def dodaj(a, b):
+    return f"{a} + {b} = {a + b}"
+
+@app.route("/odejmij/<int:a>/<int:b>")
+def odejmij(a, b):
+    return f"{a} - {b} = {a - b}"
+
+@app.route("/pomnoz/<int:a>/<int:b>")
+def pomnoz(a, b):
+    return f"{a} * {b} = {a * b}"
+
+@app.route("/podziel/<int:a>/<int:b>")
+def podziel(a, b):
+    if b == 0:
+        return "Nie dzielimy przez zero", 400
+    return f"{a} / {b} = {a / b}"
+
+@app.route("/potega/<int:a>/<int:b>")
+def potega(a, b):
+    return f"{a} ^ {b} = {a ** b}"
+
+# --- Zadanie 3: Tabliczka mnożenia ---
+@app.route("/tabliczka/<int:n>")
+def tabliczka(n):
+    if n < 1 or n > 20:
+        return "Liczba n musi być w przedziale 1-20", 400
+    
+    wynik = []
+    for i in range(1, 11):
+        wynik.append(f"{n} x {i} = {n * i}")
+    return "<br>".join(wynik)
+
+# --- Zadanie 4: Query string ---
+@app.route("/produkty")
+def produkty():
+    kat = request.args.get("kat", "wszystkie")
+    sort = request.args.get("sort", "domyślne")
+    return f"Kategoria: {kat}, sortowanie: {sort}"
+
+# --- Zadanie 5: Mini-baza w słowniku (Korty tenisowe / Rezerwacje) ---
+KORTY = {
+    1: "Kort Centralny (Nawierzchnia ceglana)",
+    2: "Kort 2 (Trawa)",
+    3: "Kort 3 (Hard court)",
+    4: "Kort Kryty A (Hala)",
+    5: "Kort Kryty B (Hala)"
+}
+
+@app.route("/element/<int:id>")
+def element(id):
+    if id not in KORTY:
+        abort(404)
+    return f"Kort: {KORTY[id]}"
+
+@app.route("/elementy")
+def elementy():
+    lista = [f"{k:id}: {nazwa}" for id, nazwa in KORTY.items()]
+    return "<br>".join(lista)
+
+# --- Zadanie 6: Przekierowanie ---
 @app.route("/")
 def index():
-    # Zmień "Twoje Imię" na swoje rzeczywiste imię
-    return "Cześć, tu Twoje Imię! Witamy w serwisie rezerwacyjnym."
+    return "Strona główna serwisu"
 
+@app.route("/start")
+def start():
+    return redirect(url_for("index"))
 
-# Zadanie 3: Dodatkowe trasy tekstowe
-@app.route("/o-nas")
-def o_nas():
-    return "Jesteśmy nowatorskim systemem do rezerwacji kortów tenisowych."
-
-
-@app.route("/kontakt")
-def kontakt():
-    return "Napisz do nas: kontakt@rezerwacje-sportowe.pl"
-
-
-@app.route("/regulamin")
-def regulamin():
-    return "1. Rezerwacji należy dokonywać z wyprzedzeniem. 2. Odwołanie rezerwacji do 24h przed."
-
-
-# Zadanie 4: Trasa z kodem statusu HTTP 403 Forbidden
-@app.route("/admin")
-def admin():
-    return "Brak dostępu", 403
-
-
-# Zadanie 5: Trasa zwracająca słownik (Flask automatycznie konwertuje na JSON)
-@app.route("/api/info")
-def api_info():
-    return {
-        "nazwa": "System Rezerwacji Kortów",
-        "autor": "Twoje Imię i Nazwisko",
-        "wersja": "0.1",
-    }
-
-
-# Uruchomienie serwera deweloperskiego z aktywnym debuggerem
 if __name__ == "__main__":
     app.run(debug=True)
