@@ -1,85 +1,21 @@
-from flask import Flask, request, url_for, redirect, abort
+# flask-start
 
-app = Flask(__name__)
+Projekt aplikacji webowej Flask — dynamiczne ścieżki.
 
-# --- Zadanie 1: Powitanie ---
-@app.route("/czesc/<imie>")
-def czesc(imie):
-    return f"Cześć, {imie}!"
+## Lista tras
 
-@app.route("/czesc/<imie>/<int:wiek>")
-def czesc_wiek(imie, wiek):
-    return f"Cześć, {imie}, masz {wiek} lat."
+- `/czesc/<imie>` — Powitanie (np. `/czesc/Jan`)
+- `/czesc/<imie>/<int:wiek>` — Powitanie z wiekiem (np. `/czesc/Jan/20`)
+- `/dodaj/<int:a>/<int:b>` — Dodawanie (np. `/dodaj/5/3`)
+- `/odejmij/<int:a>/<int:b>` — Odejmowanie (np. `/odejmij/10/4`)
+- `/pomnoz/<int:a>/<int:b>` — Mnożenie (np. `/pomnoz/4/5`)
+- `/podziel/<int:a>/<int:b>` — Dzielenie z obsługą 400 (np. `/podziel/10/2`)
+- `/potega/<int:a>/<int:b>` — Potęgowanie (np. `/potega/2/3`)
+- `/tabliczka/<int:n>` — Tabliczka mnożenia 1-20 (np. `/tabliczka/5`)
+- `/produkty?kat=...&sort=...` — Query string (np. `/produkty?kat=laptopy&sort=cena`)
+- `/element/<int:id>` — Pobieranie elementu po ID (np. `/element/1`)
+- `/elementy` — Lista wszystkich elementów
+- `/start` — Przekierowanie 302 na `/`
 
-# --- Zadanie 2: Kalkulator ---
-@app.route("/dodaj/<int:a>/<int:b>")
-def dodaj(a, b):
-    return f"{a} + {b} = {a + b}"
-
-@app.route("/odejmij/<int:a>/<int:b>")
-def odejmij(a, b):
-    return f"{a} - {b} = {a - b}"
-
-@app.route("/pomnoz/<int:a>/<int:b>")
-def pomnoz(a, b):
-    return f"{a} * {b} = {a * b}"
-
-@app.route("/podziel/<int:a>/<int:b>")
-def podziel(a, b):
-    if b == 0:
-        return "Nie dzielimy przez zero", 400
-    return f"{a} / {b} = {a / b}"
-
-@app.route("/potega/<int:a>/<int:b>")
-def potega(a, b):
-    return f"{a} ^ {b} = {a ** b}"
-
-# --- Zadanie 3: Tabliczka mnożenia ---
-@app.route("/tabliczka/<int:n>")
-def tabliczka(n):
-    if n < 1 or n > 20:
-        return "Liczba n musi być w przedziale 1-20", 400
-    
-    wynik = []
-    for i in range(1, 11):
-        wynik.append(f"{n} x {i} = {n * i}")
-    return "<br>".join(wynik)
-
-# --- Zadanie 4: Query string ---
-@app.route("/produkty")
-def produkty():
-    kat = request.args.get("kat", "wszystkie")
-    sort = request.args.get("sort", "domyślne")
-    return f"Kategoria: {kat}, sortowanie: {sort}"
-
-# --- Zadanie 5: Mini-baza w słowniku (Korty tenisowe / Rezerwacje) ---
-KORTY = {
-    1: "Kort Centralny (Nawierzchnia ceglana)",
-    2: "Kort 2 (Trawa)",
-    3: "Kort 3 (Hard court)",
-    4: "Kort Kryty A (Hala)",
-    5: "Kort Kryty B (Hala)"
-}
-
-@app.route("/element/<int:id>")
-def element(id):
-    if id not in KORTY:
-        abort(404)
-    return f"Kort: {KORTY[id]}"
-
-@app.route("/elementy")
-def elementy():
-    lista = [f"{k:id}: {nazwa}" for id, nazwa in KORTY.items()]
-    return "<br>".join(lista)
-
-# --- Zadanie 6: Przekierowanie ---
-@app.route("/")
-def index():
-    return "Strona główna serwisu"
-
-@app.route("/start")
-def start():
-    return redirect(url_for("index"))
-
-if __name__ == "__main__":
-    app.run(debug=True)
+## Odpowiedź na pytanie z Zadania 1
+Gdy w wieku podamy tekst (np. `/czesc/Jan/abc`), Flask zwróci błąd **404 Not Found**, ponieważ konwerter `<int:wiek>` oczekuje wyłącznie liczby całkowitej.
